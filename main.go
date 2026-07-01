@@ -18,11 +18,21 @@ type Restaurant struct {
 	Logo string `json:"logo" gorm:"column:logo;"`
 }
 
+type RestaurantUpdate struct {
+	Name *string `json:"name" gorm:"column:name;"`
+	Addr *string `json:"addr" gorm:"column:addr;"`
+}
+
+
+
 
 func(Restaurant) TableName() string {
 	return "restaurants"
 }
 
+func(RestaurantUpdate) TableName() string {
+	return Restaurant{}.TableName()
+}
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -42,4 +52,26 @@ func main() {
 	}
 
 	log.Println("New id", newRestaurant.Id)
+
+	var myRestaurant Restaurant
+	if err := db.Where("id = ?", 3).First(&myRestaurant).Error; err != nil {
+		log.Println(err)
+	}
+
+	log.Println(myRestaurant)
+
+	myRestaurant.Name = "200Lab"
+	newData := "200Lab"
+	updateData := RestaurantUpdate{Name: &newData}
+
+	if err := db.Where("id = ?", 2).Updates(&updateData).Error; err != nil {
+		log.Println(err)
+	}
+
+	log.Println(myRestaurant)
+
+		if err := db.Table(Restaurant{}.TableName()).Where("id = ?", 3).Delete(nil).Error; err != nil {
+		log.Println(err)
+	}
+
 }
