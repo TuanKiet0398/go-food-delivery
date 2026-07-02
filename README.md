@@ -25,10 +25,33 @@ MYSQL_CONN_STRING=user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parse
 go run main.go
 ```
 
+The server listens on `http://localhost:8080` by default.
+
+## API
+
+### Health check
+
+- `GET /ping` — returns `{"message": "pong"}`
+
+### Restaurants (`/v1/restaurants`)
+
+| Method | Path                    | Description                              |
+| ------ | ----------------------- | ----------------------------------------- |
+| POST   | `/v1/restaurants`       | Create a new restaurant                   |
+| GET    | `/v1/restaurants`       | List restaurants (paginated)              |
+| GET    | `/v1/restaurants/:id`   | Get a restaurant by id                    |
+| PATCH  | `/v1/restaurants/:id`   | Update a restaurant's `name` and/or `addr`|
+| DELETE | `/v1/restaurants/:id`   | Delete a restaurant by id                 |
+
+**Pagination query params** (for `GET /v1/restaurants`):
+
+- `page` — page number, default `1`
+- `limit` — items per page, default `5`
+
 ## Roadmap
 
 - [x] Section 02 - UI to Database
-- [ ] Section 03 - GORM
+- [x] Section 03 - GORM
 - [ ] Section 04 - Simple clean architecture
 - [ ] Section 05 - Error handling and UID
 - [ ] Section 06 - Upload file to AWS S3
