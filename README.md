@@ -52,7 +52,7 @@ The server listens on `http://localhost:8080` by default.
 
 - [x] Section 02 - UI to Database
 - [x] Section 03 - GORM
-- [ ] Section 04 - Simple clean architecture
+- [x] Section 04 - Simple clean architecture
 - [ ] Section 05 - Error handling and UID
 - [ ] Section 06 - Upload file to AWS S3
 - [ ] Section 07 - Authenticate with JWT

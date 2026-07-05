@@ -1,6 +1,7 @@
 package main
 
 import (
+	"food-delivery/module/restaurant/transport/ginrestaurant"
 	"log"      // logging to console
 	"net/http" // HTTP status code constants (200, 400, ...)
 	"os"       // read environment variables
@@ -67,24 +68,7 @@ func main() {
 	restaurants := v1.Group("/restaurants")
 
 	// Create a new restaurant
-	restaurants.POST("", func(c *gin.Context) {
-		var data Restaurant
-
-		// Bind JSON request body into data
-		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		// Insert the new record into the database
-		db.Create(&data)
-
-		c.JSON(200, gin.H{
-			"data": data,
-		})
-	})
+	restaurants.POST("", ginrestaurant.CreateRestaurant(db))
 
 	// Get a single restaurant by id
 	restaurants.GET("/:id", func(c *gin.Context) {
@@ -173,24 +157,7 @@ func main() {
 	})
 
 	// Delete a restaurant by id
-	restaurants.DELETE("/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-		}
-
-		var data RestaurantUpdate
-
-		// Delete the record matching the given id in the restaurants table
-		db.Table(Restaurant{}.TableName()).Where("id = ?", id).Delete(&data)
-
-		c.JSON(http.StatusOK, gin.H{
-			"data": 1,
-		})
-	})
+	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(db))
 
 	// Start the server, listening on port 8080 by default
 	r.Run()
