@@ -1,6 +1,7 @@
 package main
 
 import (
+	"food-delivery/component/appctx"
 	"food-delivery/module/restaurant/transport/ginrestaurant"
 	"log"      // logging to console
 	"net/http" // HTTP status code constants (200, 400, ...)
@@ -63,12 +64,14 @@ func main() {
 		})
 	})
 
+	appContext := appctx.NewAppContext(db)
+
 	// Route group for /v1/restaurants
 	v1 := r.Group("/v1")
 	restaurants := v1.Group("/restaurants")
 
 	// Create a new restaurant
-	restaurants.POST("", ginrestaurant.CreateRestaurant(db))
+	restaurants.POST("", ginrestaurant.CreateRestaurant(appContext))
 
 	// Get a single restaurant by id
 	restaurants.GET("/:id", func(c *gin.Context) {
@@ -157,7 +160,7 @@ func main() {
 	})
 
 	// Delete a restaurant by id
-	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(db))
+	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appContext))
 
 	// Start the server, listening on port 8080 by default
 	r.Run()

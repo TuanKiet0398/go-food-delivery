@@ -6,6 +6,7 @@ type Restaurant struct {
 	Id   int    `js:"id" gorm:"column:id;"`
 	Name string `json:"name" gorm:"column:name;"`
 	Addr string `json:"addr" gorm:"column:addr;"`
+	Status string `json:"status" gorm:"column:status;"`
 }
 
 // Restaurant represents a row in the "restaurants" table

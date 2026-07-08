@@ -48,6 +48,22 @@ The server listens on `http://localhost:8080` by default.
 - `page` — page number, default `1`
 - `limit` — items per page, default `5`
 
+Successful responses are wrapped in a common envelope (`common.SimpleSuccessResponse`):
+
+```json
+{ "data": ... }
+```
+
+Deleting a restaurant is a soft delete: rows have a `status` column, and deleting an
+already-deleted (`status = "0"`) restaurant returns an error instead of deleting again.
+
+## Architecture
+
+Handlers no longer take a `*gorm.DB` directly. A shared `appctx.AppContext`
+(`component/appctx`) wraps the DB connection and is threaded through
+`main.go` into the transport layer, so future shared dependencies (config,
+logger, etc.) can be added in one place.
+
 ## Roadmap
 
 - [x] Section 02 - UI to Database
