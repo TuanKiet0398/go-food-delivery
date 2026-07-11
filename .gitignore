@@ -1,5 +1,6 @@
 # Binaries
 app
+food-delivery
 *.exe
 *.exe~
 *.dll

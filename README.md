@@ -46,16 +46,27 @@ The server listens on `http://localhost:8080` by default.
 **Pagination query params** (for `GET /v1/restaurants`):
 
 - `page` — page number, default `1`
-- `limit` — items per page, default `5`
+- `limit` — items per page, default `50`
 
-Successful responses are wrapped in a common envelope (`common.SimpleSuccessResponse`):
+**Filter query params** (for `GET /v1/restaurants`):
+
+- `owner_id` — restrict results to a single owner
+
+List responses are wrapped in `common.NewSuccessResponse(data, paging, filter)`:
+
+```json
+{ "data": [...], "paging": { "page": 1, "limit": 50, "total": 0 }, "filter": { "owner_id": 0 } }
+```
+
+Other successful responses are wrapped in `common.SimpleSuccessResponse`:
 
 ```json
 { "data": ... }
 ```
 
-Deleting a restaurant is a soft delete: rows have a `status` column, and deleting an
-already-deleted (`status = "0"`) restaurant returns an error instead of deleting again.
+Deleting a restaurant is a soft delete: rows have an integer `status` column
+(`1` = active, `0` = soft-deleted), and deleting an already-deleted restaurant
+returns an error instead of deleting again.
 
 ## Architecture
 
@@ -63,6 +74,10 @@ Handlers no longer take a `*gorm.DB` directly. A shared `appctx.AppContext`
 (`component/appctx`) wraps the DB connection and is threaded through
 `main.go` into the transport layer, so future shared dependencies (config,
 logger, etc.) can be added in one place.
+
+See [architecture.md](architecture.md) for the full layered structure
+(transport → biz → storage → model), directory layout, and request-flow
+walkthroughs.
 
 ## Roadmap
 

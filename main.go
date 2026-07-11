@@ -48,11 +48,12 @@ func main() {
 	// Read the MySQL connection string and open a GORM connection
 	dsn := os.Getenv("MYSQL_CONN_STRING")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	log.Println(db)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	db = db.Debug()
 
 	// Create a Gin router with default middleware (logger + recovery)
 	r := gin.Default()
@@ -94,42 +95,7 @@ func main() {
 	})
 
 	// List restaurants with pagination
-	restaurants.GET("", func(c *gin.Context) {
-		var data []Restaurant
-
-		// Temporary struct to bind pagination params from the query string
-		type Paging struct {
-			Page  int `json:"page" form:"page"`
-			Limit int `json:"limit" form:"limit"`
-		}
-
-		var pagingData Paging
-
-		if err := c.ShouldBind(&pagingData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		// Fall back to defaults when page/limit are missing or invalid
-		if pagingData.Page <= 0 {
-			pagingData.Page = 1
-		}
-
-		if pagingData.Limit <= 0 {
-			pagingData.Limit = 5
-		}
-
-		// Fetch the page, sorted by id descending
-		db.Offset((pagingData.Page) - 1 * pagingData.Limit).
-			Order("id desc").
-			Limit(pagingData.Limit).Find(&data)
-
-		c.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-	})
+	restaurants.GET("", ginrestaurant.ListRestaurant(appContext))
 
 	// Partially update a restaurant by id
 	restaurants.PATCH("/:id", func(c *gin.Context) {

@@ -1,17 +1,17 @@
 package restaurantmodel
 
+import "food-delivery/common"
 
 // Restaurant represents a row in the "restaurants" table
 type Restaurant struct {
-	Id   int    `js:"id" gorm:"column:id;"`
+	common.SQLModel `json:",inline"`
 	Name string `json:"name" gorm:"column:name;"`
 	Addr string `json:"addr" gorm:"column:addr;"`
-	Status string `json:"status" gorm:"column:status;"`
 }
 
 // Restaurant represents a row in the "restaurants" table
 type RestaurantCreate struct {
-	Id   int    `js:"id" gorm:"column:id;"`
+	common.SQLModel `json:",inline"`
 	Name string `json:"name" gorm:"column:name;"`
 	Addr string `json:"addr" gorm:"column:addr;"`
 }
@@ -19,6 +19,7 @@ type RestaurantCreate struct {
 // RestaurantUpdate is used for partial updates (PATCH); fields are pointers
 // so we can distinguish "not provided" (nil) from "provided as empty value"
 type RestaurantUpdate struct {
+	common.SQLModel `json:",inline"`
 	Name *string `json:"name" gorm:"column:name;"`
 	Addr *string `json:"addr" gorm:"column:addr;"`
 }

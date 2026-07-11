@@ -30,7 +30,7 @@ func (biz *deleteRestaurantBiz) DeleteRestaurant(context context.Context, id int
 		return err
 	}
 
-	if oldData.Status == "0" {
+	if oldData.Status == 0 {
 		return errors.New("Data has been deleted")
 	}
 
