@@ -1,13 +1,13 @@
 package main
 
 import (
+	"food-delivery/middleware"
 	"food-delivery/component/appctx"
 	"food-delivery/module/restaurant/transport/ginrestaurant"
 	"log"      // logging to console
 	"net/http" // HTTP status code constants (200, 400, ...)
 	"os"       // read environment variables
 	"strconv"  // convert string to number
-
 	"github.com/gin-gonic/gin" // Gin web framework
 	"github.com/joho/godotenv" // load .env file into environment variables
 	"gorm.io/driver/mysql"     // MySQL driver for GORM
@@ -54,9 +54,11 @@ func main() {
 	}
 
 	db = db.Debug()
+	appContext := appctx.NewAppContext(db)
 
 	// Create a Gin router with default middleware (logger + recovery)
 	r := gin.Default()
+	r.Use(middleware.Recover(appContext))
 
 	// Health check endpoint
 	r.GET("/ping", func(c *gin.Context) {
@@ -65,7 +67,6 @@ func main() {
 		})
 	})
 
-	appContext := appctx.NewAppContext(db)
 
 	// Route group for /v1/restaurants
 	v1 := r.Group("/v1")

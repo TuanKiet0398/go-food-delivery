@@ -2,6 +2,8 @@ package restaurantmodel
 
 import "food-delivery/common"
 
+const EntityName = "restaurants"
+
 // Restaurant represents a row in the "restaurants" table
 type Restaurant struct {
 	common.SQLModel `json:",inline"`
@@ -27,6 +29,14 @@ type RestaurantUpdate struct {
 // TableName tells GORM which table to use for Restaurant
 func (Restaurant) TableName() string {
 	return "restaurants"
+}
+
+func (r *Restaurant) Mask(isAdminOrOwner bool) {
+	r.GenUID(common.DbTypeRestaurant)
+}
+
+func (data *RestaurantCreate) Mask(isAdminOrOwner bool) {
+	data.GenUID(common.DbTypeRestaurant)
 }
 
 // TableName makes RestaurantUpdate share the same table as Restaurant

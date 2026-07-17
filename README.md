@@ -68,6 +68,22 @@ Deleting a restaurant is a soft delete: rows have an integer `status` column
 (`1` = active, `0` = soft-deleted), and deleting an already-deleted restaurant
 returns an error instead of deleting again.
 
+Restaurant `id`s exposed over the API are base58-encoded virtual UIDs
+(`common.UID`), not raw integers: a UID packs `localID` (the real DB id),
+`objectType` (the entity's DB type, e.g. `common.DbTypeRestaurant`) and
+`shardID` into a single 64-bit value. `DELETE /v1/restaurants/:id` decodes
+the UID back into the local DB id via `common.FromBase58`.
+
+## Error handling
+
+Handlers no longer write ad-hoc `c.JSON(http.StatusBadRequest, ...)` error
+bodies. Business/storage errors are wrapped into a `*common.AppError`
+(`common.ErrInvalidRequest`, `common.ErrDB`, `common.ErrCannotCreateEntity`,
+etc.) and `panic`'d from the transport layer. `middleware.Recover`, mounted
+in `main.go`, recovers the panic and writes the appropriate JSON status and
+body — an `*common.AppError` keeps its own status code/message, any other
+recovered value is wrapped as a `500` via `common.ErrInternal`.
+
 ## Architecture
 
 Handlers no longer take a `*gorm.DB` directly. A shared `appctx.AppContext`
@@ -84,7 +100,7 @@ walkthroughs.
 - [x] Section 02 - UI to Database
 - [x] Section 03 - GORM
 - [x] Section 04 - Simple clean architecture
-- [ ] Section 05 - Error handling and UID
+- [x] Section 05 - Error handling and UID
 - [ ] Section 06 - Upload file to AWS S3
 - [ ] Section 07 - Authenticate with JWT
 - [ ] Section 08 - Linking model user and repository layer

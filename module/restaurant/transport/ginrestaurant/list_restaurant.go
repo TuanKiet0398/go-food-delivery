@@ -19,10 +19,7 @@ func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		var pagingData common.Paging
 
 		if err := c.ShouldBind(&pagingData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		// Set default value when not set paging parameters
@@ -32,10 +29,7 @@ func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 
 		// Bind JSON request body into data
 		if err := c.ShouldBind(&filter); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		// New connection from DB
@@ -46,12 +40,13 @@ func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &pagingData)
 
 		if err != nil {
-						c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 
-		c.JSON(200, common.NewSuccessResponse(result, pagingData, filter))
+		for i := range result {
+			result[i].Mask(false)
+		}
+
+		c.JSON(http.StatusOK, common.NewSuccessResponse(result, pagingData, filter))
 	}
 }
